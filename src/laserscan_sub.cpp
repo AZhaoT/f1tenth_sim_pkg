@@ -1,25 +1,29 @@
 #include <memory>
 #include <iostream>
 #include <limits>
+#include <chrono>
+#include <memory>
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
+#include "f1tenth_sim/msg/scan_range.hpp"
+
 using std::placeholders::_1;
+using namespace std::chrono_literals;
 
 
-
-
+//create node laserscan_subscriber
 class LaserScanMaxMin : public rclcpp::Node
 {
   public:
   LaserScanMaxMin()
     : Node("laserscan_subscriber")
     {
+      //subscriber subscibes topic LaserScan
       subscription_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
-      "scan", 10, std::bind(&LaserScanMaxMin::topic_callback, this, _1));
-      publisher_ = this->create_publisher<ssensor_msgs::msg::LaserScan>(
-      "farthest point", 10);
-
+      "scan", 10, std::bind(&LaserScanMaxMin::scan_sub_callback, this, _1));
+      //publisher publishes on topic scan_range
+      publisher_ = this->create_publisher<f1tenth_sim::msg::ScanRange>("scan_range",10);
     }
 
   private:
@@ -28,13 +32,12 @@ class LaserScanMaxMin : public rclcpp::Node
       double min{};
     }; 
 
-    void topic_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) const
+    void scan_sub_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) const
     {
-      
       const int arr_size = 1081;
       const int range_max = 30;
       const int range_min = 0;
-      maxmin max_min{};
+      maxmin max_min{}; //change
 
       // Loop to store largest number to max_min.max, smallest number to max_min.min
       for (int i = 0; i < arr_size; ++i)
@@ -45,16 +48,24 @@ class LaserScanMaxMin : public rclcpp::Node
         if (max_min.min > msg->ranges[i] && msg->ranges[i] >= range_min)
           max_min.min = msg->ranges[i];
       }
-      //RCLCPP_INFO_STREAM("LaserScan (val,angle)=(%f,%f", msg->scan_time);
-      RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "range max is: " <<  max_min.max);
-      RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "range min is: " <<  max_min.min);
-              
+      //Subscriber print:
+      //RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "range max is: " <<  max_min.max);
+      //RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "range min is: " <<  max_min.min);
+      
+      //publish ScanRange msg to the topic /scan_range
+      auto message = f1tenth_sim::msg::ScanRange();
+      message.farthest_point = max_min.max;
+      message.closest_point = max_min.min;
+      //publish
       publisher_->publish(message);
+      //Publisher print:
+      RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "farthest point is:" << message.farthest_point);
+      RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "closest point is:" << message.closest_point);
 
     }
 
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr subscription_;
-    rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr publisher_;
+    rclcpp::Publisher<f1tenth_sim::msg::ScanRange>::SharedPtr publisher_;
 };
 
 

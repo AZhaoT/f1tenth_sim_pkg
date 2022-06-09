@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(cpp_laserscan_sub)
+project(f1tenth_sim)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -19,13 +19,28 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+
+set(msg_files
+  "msg/ScanRange.msg"
+)
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  ${msg_files}
+)
+
+ament_export_dependencies(rosidl_default_runtime)
 
 add_executable(laserscan_subscriber src/laserscan_sub.cpp)
 ament_target_dependencies(laserscan_subscriber rclcpp std_msgs sensor_msgs)
 
 install(TARGETS
 	laserscan_subscriber
-	DESTINATION lib/${PROJECT_NAME})
+	DESTINATION lib/${PROJECT_NAME}
+)
+
+rosidl_target_interfaces(laserscan_subscriber
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

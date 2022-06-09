@@ -1,0 +1,2 @@
+float64 farthest_point
+float64 closest_point
