@@ -19,7 +19,11 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(ackermann_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+
 
 set(msg_files
   "msg/ScanRange.msg"
@@ -32,14 +36,19 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 ament_export_dependencies(rosidl_default_runtime)
 
 add_executable(laserscan_subscriber src/laserscan_sub.cpp)
+add_executable(auto_brake src/safety_node.cpp)
 ament_target_dependencies(laserscan_subscriber rclcpp std_msgs sensor_msgs)
+ament_target_dependencies(auto_brake rclcpp std_msgs sensor_msgs nav_msgs std_msgs ackermann_msgs)
 
 install(TARGETS
 	laserscan_subscriber
+  auto_brake
 	DESTINATION lib/${PROJECT_NAME}
 )
 
-rosidl_target_interfaces(laserscan_subscriber
+rosidl_target_interfaces(laserscan_subscriber 
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+rosidl_target_interfaces(auto_brake 
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 if(BUILD_TESTING)
@@ -52,5 +61,11 @@ if(BUILD_TESTING)
   #set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+# Install launch files.
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
+)
 
 ament_package()
