@@ -1,0 +1,3 @@
+float64 pid_prev_error
+float64 pid_curr_error
+float64 pid_vel

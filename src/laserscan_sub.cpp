@@ -9,6 +9,8 @@
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "f1tenth_sim/msg/scan_range.hpp"
 
+#define PI 3.14159265
+
 using std::placeholders::_1;
 using namespace std::chrono_literals;
 
@@ -54,15 +56,18 @@ private:
     // RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "range max is: " <<  max_min.max);
     // RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "range min is: " <<  max_min.min);
 
+    int right_angle = 3.927/msg->angle_increment;
     // publish ScanRange msg to the topic /scan_range
     auto message = f1tenth_sim::msg::ScanRange();
     message.farthest_point = max_min.max;
     message.closest_point = max_min.min;
+    message.distance_right = msg->ranges[right_angle];
     // publish
     publisher_->publish(message);
     // Publisher print:
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "farthest point is:" << message.farthest_point);
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "closest point is:" << message.closest_point);
+    //RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "farthest point is:" << message.farthest_point);
+    //RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "closest point is:" << message.closest_point);
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("rclcpp"), "right distance is:" << message.distance_right);
   }
 
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr subscription_;
