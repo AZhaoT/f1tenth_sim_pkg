@@ -28,6 +28,7 @@ find_package(rosidl_default_generators REQUIRED)
 set(msg_files
   "msg/ScanRange.msg"
   "msg/PidInput.msg"
+  "msg/GapDir.msg"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
@@ -38,13 +39,20 @@ ament_export_dependencies(rosidl_default_runtime)
 
 add_executable(laserscan_subscriber src/laserscan_sub.cpp)
 add_executable(auto_brake src/safety_node.cpp)
-add_executable(dist_finder src/dist_finder)
-add_executable(control src/control)
+add_executable(dist_finder src/dist_finder.cpp)
+add_executable(control src/control.cpp)
+add_executable(gap_finder src/reactive_gap_follow.cpp)
+add_executable(drive_to_gap src/drive_to_gap.cpp)
+
+
 
 ament_target_dependencies(laserscan_subscriber rclcpp std_msgs sensor_msgs)
 ament_target_dependencies(auto_brake rclcpp std_msgs sensor_msgs nav_msgs ackermann_msgs)
 ament_target_dependencies(dist_finder rclcpp std_msgs sensor_msgs)
 ament_target_dependencies(control rclcpp std_msgs sensor_msgs ackermann_msgs)
+ament_target_dependencies(gap_finder rclcpp std_msgs sensor_msgs)
+ament_target_dependencies(drive_to_gap rclcpp std_msgs ackermann_msgs)
+
 
 
 install(TARGETS
@@ -52,6 +60,8 @@ install(TARGETS
   auto_brake
   dist_finder
   control
+  gap_finder
+  drive_to_gap
 	DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -61,8 +71,13 @@ rosidl_target_interfaces(auto_brake
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 rosidl_target_interfaces(dist_finder 
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
-  rosidl_target_interfaces(control 
+rosidl_target_interfaces(control 
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
+rosidl_target_interfaces(gap_finder 
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+rosidl_target_interfaces(drive_to_gap
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
