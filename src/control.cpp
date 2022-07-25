@@ -38,11 +38,12 @@ private:
   double prev_time{};
   double curr_time{};
   double dt{};
-  double kp{3};
+  double kp{0.4};
   double ki{0.0};
-  double kd{0.44};
+  double kd{0.01};
   double err_scale{1};
   double integral_err{};
+  //  double kp{3}; double ki{0.0}; double kd{0.44};
 
   // return a double instead of callback???
   void scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr scan_msg)
@@ -57,7 +58,8 @@ private:
     double diff_err = (pid_msg->pid_curr_error - pid_msg->pid_prev_error) / dt;
     integral_err += pid_msg->pid_curr_error * dt;
     double steering_angle = err_scale * (kp * pid_msg->pid_curr_error + kd * diff_err + ki * integral_err);
-    double vel = 1/(100*abs(diff_err) + 0.7); //drive faster if small error
+    double vel = 1.5; // (abs(steering_angle) + 100*abs(diff_err)); //drive faster if small error
+    //last worked: 1
 
     // 
     auto drive_msg = ackermann_msgs::msg::AckermannDriveStamped();

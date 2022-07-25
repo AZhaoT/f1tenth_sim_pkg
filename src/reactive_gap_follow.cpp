@@ -38,7 +38,7 @@ private:
     const double angle2 = (90) * PI / 180;  // 90 deg to the left
     const int dist_angle1_index = (angle1 - scan_msg->angle_min) / scan_msg->angle_increment;
     const int dist_angle2_index = (angle2 - scan_msg->angle_min) / scan_msg->angle_increment;
-    const int bubble_size{150};
+    const int bubble_size{80};
     // int gaplen{};
     // int largest_gaplen{};
     // int largest_gap_end{};
@@ -50,25 +50,28 @@ private:
       //check for furthest point
       
 
-      if ((scan_msg->ranges[i] - scan_msg->ranges[i-1]) > 1) // disparity: obstacle to the right of the scan
+      if ((scan_msg->ranges[i] - scan_msg->ranges[i-1]) > 0.3) // disparity: obstacle to the right of the scan
       {
         for (int j = 0; j < bubble_size; j++)
           scan_msg->ranges[i+j] = scan_msg->ranges[i-1]; // overwrite some elements after the disparity
 
         i += (bubble_size);  // jump forward to the next unoverwritten element
       }
-      else if((scan_msg->ranges[i] - scan_msg->ranges[i+1]) > 1) // disparity obstacle to the left of the scan
+      else if((scan_msg->ranges[i] - scan_msg->ranges[i+1]) > 0.3) // disparity obstacle to the left of the scan
       {
         for (int j = 0; j < bubble_size; j++)
           scan_msg->ranges[i-j] = scan_msg->ranges[i+1]; // overwrite some elements before the disparity
 
-        i -= (bubble_size);                              // jump backward to the ealiest overwriteen element
+        i -= (bubble_size);                              // jump backward to the earliest overwriten element
         furthest_point_index -= bubble_size;
       }
       else{
         //no disparity
         if (scan_msg->ranges[furthest_point_index] < scan_msg->ranges[i])
-          furthest_point_index = i;
+          {
+            furthest_point_index = i;
+          }
+        
       }
     }
 

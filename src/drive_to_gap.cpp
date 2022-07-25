@@ -35,8 +35,15 @@ private:
   {
     // publish drive msg
     auto drive_msg = ackermann_msgs::msg::AckermannDriveStamped();
-    drive_msg.drive.steering_angle = gapdir_msg->gap_direction;
-    drive_msg.drive.speed = std::min(4.0, abs(1 / gapdir_msg->gap_direction));
+    drive_msg.drive.steering_angle = gapdir_msg->gap_direction/1.5;
+    drive_msg.drive.steering_angle_velocity = 0.3;
+
+    if(drive_msg.drive.steering_angle > 0.6)
+      drive_msg.drive.speed = 0.5 / drive_msg.drive.steering_angle;
+    else
+      drive_msg.drive.speed = std::min(8.0, abs(1.0 / drive_msg.drive.steering_angle));
+    //0.66 max steer
+
     // publish
     publisher_drive->publish(drive_msg);
     // Publisher print:
