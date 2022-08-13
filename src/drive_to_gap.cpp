@@ -41,8 +41,10 @@ private:
     if(drive_msg.drive.steering_angle > 0.6)
       drive_msg.drive.speed = 0.5 / drive_msg.drive.steering_angle;
     else
-      drive_msg.drive.speed = std::min(8.0, abs(1.0 / drive_msg.drive.steering_angle));
+      drive_msg.drive.speed = std::min(8.0, abs(1.0 / drive_msg.drive.steering_angle)); //max=8 for speilberg
     //0.66 max steer
+
+    //decelarate before corners by examining distance to furthest point
 
     // publish
     publisher_drive->publish(drive_msg);

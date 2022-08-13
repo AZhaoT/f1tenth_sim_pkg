@@ -29,6 +29,8 @@ set(msg_files
   "msg/ScanRange.msg"
   "msg/PidInput.msg"
   "msg/GapDir.msg"
+  "msg/OppGapDir.msg"
+  "msg/Transformation.msg"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
@@ -43,6 +45,9 @@ add_executable(dist_finder src/dist_finder.cpp)
 add_executable(control src/control.cpp)
 add_executable(gap_finder src/reactive_gap_follow.cpp)
 add_executable(drive_to_gap src/drive_to_gap.cpp)
+add_executable(opp_gap_finder src/opp_reactive_gap_follow.cpp)
+add_executable(opp_drive_to_gap src/opp_drive_to_gap.cpp)
+add_executable(scan_match_transform src/transform.cpp)
 
 
 
@@ -52,6 +57,9 @@ ament_target_dependencies(dist_finder rclcpp std_msgs sensor_msgs)
 ament_target_dependencies(control rclcpp std_msgs sensor_msgs ackermann_msgs)
 ament_target_dependencies(gap_finder rclcpp std_msgs sensor_msgs)
 ament_target_dependencies(drive_to_gap rclcpp std_msgs ackermann_msgs)
+ament_target_dependencies(opp_gap_finder rclcpp std_msgs sensor_msgs)
+ament_target_dependencies(opp_drive_to_gap rclcpp std_msgs ackermann_msgs)
+ament_target_dependencies(scan_match_transform rclcpp std_msgs sensor_msgs)
 
 
 
@@ -62,6 +70,9 @@ install(TARGETS
   control
   gap_finder
   drive_to_gap
+  opp_gap_finder
+  opp_drive_to_gap
+  scan_match_transform
 	DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -76,6 +87,12 @@ rosidl_target_interfaces(control
 rosidl_target_interfaces(gap_finder 
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 rosidl_target_interfaces(drive_to_gap
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+rosidl_target_interfaces(opp_gap_finder 
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+rosidl_target_interfaces(opp_drive_to_gap
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+rosidl_target_interfaces(scan_match_transform
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 if(BUILD_TESTING)
